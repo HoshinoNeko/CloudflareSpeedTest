@@ -97,6 +97,10 @@ jobs:
       GOARCH: ${{ matrix.goarch }}
       GOARM: ${{ matrix.goarm }}
       CGO_ENABLED: 0
+
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v3
