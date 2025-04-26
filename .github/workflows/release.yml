@@ -117,15 +117,25 @@ jobs:
         run: go mod download
 
 
+      - name: Set Version Variable
+        id: set_version
+        run: |
+          if [[ -n "${GITHUB_REF_NAME}" && "${GITHUB_REF}" == "refs/tags/${GITHUB_REF_NAME}" ]]; then
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=v6.6.6" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build CloudflareST
         run: |
           mkdir -p build_assets
-          go build -v -o build_assets/CloudflareST -trimpath -ldflags "-X main.version=1.2.3 -s -w -buildid="
+          go build -v -o build_assets/CloudflareST -trimpath -ldflags "-X main.version=${{ steps.set_version.outputs.version }} -s -w -buildid="
 
       - name: Build Mips softfloat CloudflareST
         if: matrix.goarch == 'mips' || matrix.goarch == 'mipsle'
         run: |
-          GOMIPS=softfloat go build -v -o build_assets/CloudflareST_softfloat -trimpath -ldflags "-X main.version=1.2.3 -s -w -buildid="
+          GOMIPS=softfloat go build -v -o build_assets/CloudflareST_softfloat -trimpath -ldflags "-X main.version=${{ steps.set_version.outputs.version }} -s -w -buildid="
+
       - name: Rename Windows CloudflareST
         if: matrix.goos == 'windows'
         run: |
